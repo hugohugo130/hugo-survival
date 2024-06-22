@@ -1,4 +1,5 @@
 from github import Github as g
+from requests import get
 from os.path import exists
 from os import makedirs as md
 result = None
@@ -15,10 +16,13 @@ for curfilename in filename:
     else:
         curfilename_ = curfilename.split("\\")[-1]
     print(f"正在檢查{curfilename_}...")
-    git = g("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")
-    repo = git.get_repo(link)
-    content = repo.get_contents(curfilename if "\\" not in curfilename else curfilename.split("\\")[-1])
-    latestfile = content.decoded_content
+    if curfilename != "game.py":
+        git = g()
+        repo = git.get_repo(link)
+        content = repo.get_contents(curfilename if "\\" not in curfilename else curfilename.split("\\")[-1])
+        latestfile = content.decoded_content
+    else:
+        latestfile = get("https://pastebin.com/raw/s6x1yBDz").content
     if not exists(curfilename):
         result = 2
     else:
@@ -33,7 +37,10 @@ for curfilename in filename:
         if result == 1:
             print(f"檢測到更新!正在更新{curfilename_}...")
         else:
-            print(f"正在從github獲取{curfilename_}")
+            if curfilename == "game.py":
+                print(f"正在從pastebin獲取{curfilename_}")
+            else:
+                print(f"正在從github獲取{curfilename_}")
         with open(curfilename,"wb") as gamefile:
             gamefile.write(latestfile)
     else:
